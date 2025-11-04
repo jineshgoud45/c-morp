@@ -18,8 +18,8 @@ from pydantic import BaseModel
 
 # Import existing backend services
 from solver_bridge import SolverBridge, OptimizationResult
-from guard_rail import GuardRail, SafetyConstraint
-from alert_broker import AlertBroker, AlertSeverity
+from guard_rail import GuardRail, Constraint
+from alert_broker import AlertBroker
 from user_feedback import UserFeedback
 
 # Import our models
