@@ -53,9 +53,9 @@ app.add_middleware(
 
 # Initialize backend services
 solver = SolverBridge()
-guard_rail = GuardRail()
-alert_broker = AlertBroker()
-user_feedback = UserFeedback()
+# guard_rail = GuardRail()
+# alert_broker = AlertBroker()
+# user_feedback = UserFeedback()
 
 # WebSocket connection manager
 class ConnectionManager:
