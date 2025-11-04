@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C-MORP - Campus Microgrid Optimization Platform</title>
+    <meta name="description" content="Real-time microgrid optimization and monitoring platform">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icons/icon-192x192.png" type="image/png">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    <meta name="theme-color" content="#2E7D32">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- App Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                    <span class="material-icons">menu</span>
+                </button>
+                <div class="app-logo">
+                    <img src="/icons/icon-96x96.png" alt="C-MORP Logo" class="logo-icon">
+                    <div class="logo-text">
+                        <h1 class="app-title">C-MORP</h1>
+                        <p class="app-subtitle">Microgrid Control</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-center">
+                <div class="status-indicators">
+                    <div class="status-item" id="connectionStatus">
+                        <span class="material-icons status-icon">wifi</span>
+                        <span class="status-text">Connected</span>
+                    </div>
+                    <div class="status-item" id="systemStatus">
+                        <span class="material-icons status-icon success">check_circle</span>
+                        <span class="status-text">Optimal</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <button class="notification-btn" id="notificationBtn" aria-label="Notifications">
+                    <span class="material-icons">notifications</span>
+                    <span class="notification-badge" id="notificationBadge">2</span>
+                </button>
+                <button class="user-menu-btn" id="userMenuBtn" aria-label="User menu">
+                    <span class="material-icons">account_circle</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <h3 class="nav-title">Dashboard</h3>
+                <ul class="nav-list">
+                    <li class="nav-item active">
+                        <a href="#dashboard" class="nav-link">
+                            <span class="material-icons">dashboard</span>
+                            <span>Overview</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#energy" class="nav-link">
+                            <span class="material-icons">bolt</span>
+                            <span>Energy Flow</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#devices" class="nav-link">
+                            <span class="material-icons">devices</span>
+                            <span>Devices</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <h3 class="nav-title">Control</h3>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#optimize" class="nav-link">
+                            <span class="material-icons">tune</span>
+                            <span>Optimize</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#alerts" class="nav-link">
+                            <span class="material-icons">warning</span>
+                            <span>Alerts</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#reports" class="nav-link">
+                            <span class="material-icons">analytics</span>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <h3 class="nav-title">System</h3>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#settings" class="nav-link">
+                            <span class="material-icons">settings</span>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+            <h3 class="stats-title">Quick Stats</h3>
+            <div class="stat-item">
+                <span class="stat-label">Battery SOC</span>
+                <span class="stat-value" id="quickBatterySOC">--%</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Current Load</span>
+                <span class="stat-value" id="quickCurrentLoad">--kW</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Daily Savings</span>
+                <span class="stat-value" id="quickDailySavings">₹--</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content" id="mainContent">
+        <div class="content-container">
+
+            <!-- Dashboard Overview Section -->
+            <section class="dashboard-section" id="dashboardSection">
+                <div class="section-header">
+                    <h2 class="section-title">Energy Overview</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-secondary btn-sm" id="refreshDataBtn">
+                            <span class="material-icons">refresh</span>
+                            Refresh
+                        </button>
+                        <select class="time-range-selector" id="timeRangeSelector">
+                            <option value="24h">Last 24 Hours</option>
+                            <option value="7d">Last 7 Days</option>
+                            <option value="30d">Last 30 Days</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Energy Cards Grid -->
+                <div class="energy-cards-grid">
+                    <div class="energy-card consumption-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <span class="material-icons">power</span>
+                            </div>
+                            <div class="card-title">
+                                <h3>Consumption</h3>
+                                <p class="card-subtitle">Current Load</p>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="metric-value" id="consumptionValue">--</div>
+                            <div class="metric-unit">kW</div>
+                            <div class="metric-trend" id="consumptionTrend">
+                                <span class="material-icons trend-icon">trending_up</span>
+                                <span class="trend-value">+12%</span>
+                            </div>
+                        </div>
+                        <div class="card-chart">
+                            <canvas id="consumptionSparkline"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="energy-card generation-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <span class="material-icons">wb_sunny</span>
+                            </div>
+                            <div class="card-title">
+                                <h3>Generation</h3>
+                                <p class="card-subtitle">Solar Output</p>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="metric-value" id="generationValue">--</div>
+                            <div class="metric-unit">kW</div>
+                            <div class="metric-trend" id="generationTrend">
+                                <span class="material-icons trend-icon">trending_up</span>
+                                <span class="trend-value">+8%</span>
+                            </div>
+                        </div>
+                        <div class="card-chart">
+                            <canvas id="generationSparkline"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="energy-card battery-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <span class="material-icons">battery_charging_full</span>
+                            </div>
+                            <div class="card-title">
+                                <h3>Battery</h3>
+                                <p class="card-subtitle">State of Charge</p>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="metric-value" id="batteryValue">--</div>
+                            <div class="metric-unit">%</div>
+                            <div class="battery-gauge" id="batteryGauge">
+                                <div class="gauge-fill"></div>
+                                <div class="gauge-text">--%</div>
+                            </div>
+                        </div>
+                        <div class="battery-power" id="batteryPower">
+                            <span class="material-icons">flash_on</span>
+                            <span id="batteryPowerValue">-- kW</span>
+                        </div>
+                    </div>
+
+                    <div class="energy-card savings-card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <span class="material-icons">savings</span>
+                            </div>
+                            <div class="card-title">
+                                <h3>Savings</h3>
+                                <p class="card-subtitle">Daily Total</p>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="metric-value" id="savingsValue">--</div>
+                            <div class="metric-unit">₹</div>
+                            <div class="carbon-savings" id="carbonSavings">
+                                <span class="material-icons">eco</span>
+                                <span id="carbonSavingsValue">-- kg CO₂</span>
+                            </div>
+                        </div>
+                        <div class="savings-breakdown">
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Energy</span>
+                                <span class="breakdown-value" id="energySavings">₹--</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="breakdown-label">Peak</span>
+                                <span class="breakdown-value" id="peakSavings">₹--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Energy Flow (24 Hours)</h3>
+                            <div class="chart-controls">
+                                <button class="chart-control-btn active" data-chart="line">
+                                    <span class="material-icons">show_chart</span>
+                                </button>
+                                <button class="chart-control-btn" data-chart="area">
+                                    <span class="material-icons">area_chart</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-content">
+                            <canvas id="energyFlowChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Energy Sources</h3>
+                            <div class="chart-controls">
+                                <button class="chart-control-btn" id="refreshSourceChart">
+                                    <span class="material-icons">refresh</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-content">
+                            <canvas id="energySourceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Control Panel Section -->
+            <section class="control-panel-section">
+                <div class="control-panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Optimization Controls</h3>
+                        <button class="panel-toggle" id="controlPanelToggle">
+                            <span class="material-icons">expand_less</span>
+                        </button>
+                    </div>
+
+                    <div class="panel-content" id="controlPanelContent">
+                        <div class="control-group">
+                            <label class="control-label">Cost Priority</label>
+                            <div class="slider-control">
+                                <input type="range" class="slider" id="costPrioritySlider"
+                                       min="0" max="100" value="70">
+                                <div class="slider-value" id="costPriorityValue">70%</div>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label">Green Energy Priority</label>
+                            <div class="slider-control">
+                                <input type="range" class="slider" id="greenPrioritySlider"
+                                       min="0" max="100" value="80">
+                                <div class="slider-value" id="greenPriorityValue">80%</div>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label">Battery Range</label>
+                            <div class="range-control">
+                                <input type="range" class="range-slider" id="batteryMinSlider"
+                                       min="10" max="50" value="20">
+                                <input type="range" class="range-slider" id="batteryMaxSlider"
+                                       min="50" max="95" value="85">
+                                <div class="range-value">
+                                    <span id="batteryRangeValue">20% - 85%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="control-actions">
+                            <button class="btn btn-primary" id="optimizeBtn">
+                                <span class="material-icons">auto_fix_high</span>
+                                Optimize Now
+                            </button>
+                            <button class="btn btn-secondary" id="resetBtn">
+                                <span class="material-icons">restore</span>
+                                Reset to Default
+                            </button>
+                        </div>
+
+                        <div class="optimization-status" id="optimizationStatus">
+                            <div class="status-indicator">
+                                <span class="material-icons status-icon">info</span>
+                                <span class="status-text">Ready to optimize</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Alerts Section -->
+            <section class="alerts-section">
+                <div class="alerts-header">
+                    <h3 class="alerts-title">Active Alerts</h3>
+                    <button class="view-all-alerts-btn" id="viewAllAlertsBtn">
+                        View All
+                        <span class="material-icons">arrow_forward</span>
+                    </button>
+                </div>
+
+                <div class="alerts-list" id="alertsList">
+                    <!-- Alerts will be dynamically inserted here -->
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <a href="#dashboard" class="nav-item active">
+            <span class="material-icons">dashboard</span>
+            <span>Home</span>
+        </a>
+        <a href="#energy" class="nav-item">
+            <span class="material-icons">bolt</span>
+            <span>Energy</span>
+        </a>
+        <a href="#devices" class="nav-item">
+            <span class="material-icons">devices</span>
+            <span>Devices</span>
+        </a>
+        <a href="#optimize" class="nav-item">
+            <span class="material-icons">tune</span>
+            <span>Control</span>
+        </a>
+        <a href="#alerts" class="nav-item">
+            <span class="material-icons">warning</span>
+            <span>Alerts</span>
+            <span class="nav-badge" id="mobileAlertBadge">2</span>
+        </a>
+    </nav>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading dashboard...</p>
+        </div>
+    </div>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+
+    <!-- Application JavaScript -->
+    <script src="js/api.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
