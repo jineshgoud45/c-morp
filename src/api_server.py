@@ -348,7 +348,7 @@ async def get_active_alerts():
             Alert(
                 title="High Load Period",
                 message="Current consumption exceeds predicted forecast by 15%",
-                severity=AlertSeverity.MEDIUM,
+                severity="medium",
                 timestamp=datetime.utcnow() - timedelta(minutes=30),
                 metadata={"current_load": 285.3, "predicted_load": 248.1}
             ),
