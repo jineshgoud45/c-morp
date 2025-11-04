@@ -355,7 +355,7 @@ async def get_active_alerts():
             Alert(
                 title="Battery Efficiency",
                 message="Battery system operating at optimal efficiency",
-                severity=AlertSeverity.LOW,
+                severity="low",
                 timestamp=datetime.utcnow() - timedelta(hours=2),
                 metadata={"efficiency": 96.2, "temperature": 25.5}
             )
