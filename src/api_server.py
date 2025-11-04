@@ -134,7 +134,7 @@ async def generate_realtime_data():
                 alert = Alert(
                     title=random.choice(["High Load Detected", "Battery Low", "Peak Hours Active"]),
                     message="System optimization recommended",
-                    severity=random.choice(list(AlertSeverity)),
+                    severity=random.choice(["low", "medium", "high", "critical"]),
                     timestamp=datetime.utcnow()
                 )
                 alert_message = WebSocketMessage(
